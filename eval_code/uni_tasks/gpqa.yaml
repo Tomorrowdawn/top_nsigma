@@ -1,0 +1,11 @@
+name: "GPQA_main"
+dataset:
+  path: "Idavidrein/gpqa"
+  name: "gpqa_main"
+  split: "train"
+preprocessor: utils.gpqa_process_docs
+output_instruction: |
+  Your response *must* end with "The final answer is (answer)". For example:
+  (Question and your reasoning)
+  The final answer is (A).
+output_regex: The final answer is (.*)$

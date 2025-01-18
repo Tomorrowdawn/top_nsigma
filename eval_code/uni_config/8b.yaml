@@ -1,0 +1,45 @@
+seed: 42
+save_dir: "./8Btest_results"
+
+models:
+  - name: "Llama-3-8B-Instruct"
+    template: "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nYou are a helpful expert problem solver. Please strictly follow the user's instructions, especially the output format.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\nPlease answer the following question:\n\n{question}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
+
+maxtokens: &maxtokens [2048]
+temperatures: &temperatures [0.7, 1.0, 1.5, 2.0, 3.0, 4.0]
+generations: &generations [1]
+algorithms:
+  - name: "top_nsigma"
+    params:
+      temperature: *temperatures
+      max_tokens: *maxtokens
+      n: *generations
+    facade_params:
+      top_nsigma: [1.0]
+  - name: "min_p"
+    params:
+      temperature: *temperatures
+      min_p: [0.1]
+      max_tokens: *maxtokens
+      n: *generations
+  - name: "top_p"
+    params:
+      temperature: *temperatures
+      top_p: [0.9]
+      max_tokens: *maxtokens
+      n: *generations
+  - name: "top_k"
+    params:
+      temperature: *temperatures
+      top_k: [20]
+      max_tokens: *maxtokens
+      n: *generations
+
+tasks:
+  - "./uni_tasks/gsm8k.yaml"
+  - "./uni_tasks/gpqa.yaml"
+  - "./uni_tasks/math500.yaml"
+  - "./uni_tasks/aqua.yaml"
+
+metrics:
+  - name: ExactMatch

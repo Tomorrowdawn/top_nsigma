@@ -1,0 +1,12 @@
+name: "MATH500"
+dataset:
+  path: "qq8933/MATH500"
+  name: "main"
+  split: "test"
+preprocessor: math_utils.math500_process_docs
+output_norm: math_utils.math500_normalize
+output_instruction: |
+  Your response *must* end with "The final answer is (answer)". For example:
+  (Question and your reasoning)
+  The final answer is -2.
+output_regex: The final answer is (.*)$

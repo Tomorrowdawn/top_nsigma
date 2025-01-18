@@ -1,0 +1,11 @@
+name: "GSM8K"
+dataset:
+  path: "gsm8k"
+  name: "main"
+  split: "test"
+preprocessor: utils.gsm8k_process_docs
+output_instruction: |
+  Your response *must* end with "The final answer is (answer)". No units. For example:
+  (Question and your reasoning)
+  The final answer is 33.
+output_regex: The final answer is .*?(\d+\.?\d*|\.\d+)[\s\S]*?(?<!\.)\.$

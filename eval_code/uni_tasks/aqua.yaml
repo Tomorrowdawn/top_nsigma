@@ -1,0 +1,11 @@
+name: "AQuA"
+dataset:
+  path: "deepmind/aqua_rat"
+  name: "raw"
+  split: "test"
+preprocessor: utils.aqua_process_docs
+output_instruction: |
+  Your response *must* end with "The final answer is (answer)". For example:
+  (Question and your reasoning)
+  The final answer is (A).
+output_regex: The final answer is (.*)$
