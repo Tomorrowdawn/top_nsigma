@@ -157,7 +157,7 @@ class FacadeSampler(nn.Module):
         # Process each sequence
         for i, seq_id in enumerate(seq_ids):
             if seq_id.item() in self.tracker._states:
-                state = self.tracker._states[seq_id.item()]
+                state = self.tracker._states[int(seq_id.item())]
 
                 # Sort probabilities in descending order
                 sorted_probs, sorted_indices = torch.sort(probs[i], descending=True)
@@ -190,10 +190,33 @@ class FacadeSampler(nn.Module):
         return num / den
 
     def _compute_k(self, n: int, s: float, max_surprise: float) -> int:
-        """Compute k (number of tokens to keep) based on mirostat parameters."""
-        eps = s - 1
-        k = ((eps * (2**max_surprise)) / (1 - n ** (-eps))) ** (1 / s)
-        return max(1, round(k))
+        """Compute k (number of tokens to keep) based on mirostat parameters.
+
+        Args:
+            n: Vocabulary size
+            s: Slope parameter estimated from probability distribution
+            max_surprise: Maximum allowed surprise value
+
+        Returns:
+            k: Number of tokens to keep
+        """
+        # Add numerical stability checks
+        eps = max(s - 1, 1e-4)  # Ensure eps is positive
+
+        try:
+            # Use log space to avoid overflow
+            log_num = math.log(eps) + max_surprise * math.log(2)
+            log_den = math.log(1 - math.pow(n, -eps))
+            log_k = (log_num - log_den) / s
+            k = math.exp(log_k)
+
+            # Ensure k is in valid range
+            k = max(1, min(round(k), n))
+            return k
+
+        except (OverflowError, ValueError, ZeroDivisionError):
+            # Fallback to a reasonable default if computation fails
+            return max(1, min(round(n * 0.1), n))  # Return 10% of vocab size as fallback
 
     def mirostat_update(self, sample_results: SampleResultType):
         """Update mirostat state based on sampling results."""
@@ -203,7 +226,7 @@ class FacadeSampler(nn.Module):
         # Process each sequence in the batch
         for i, seq_id in enumerate(seq_ids):
             if seq_id.item() in self.tracker._states:
-                state = self.tracker._states[seq_id.item()]
+                state = self.tracker._states[int(seq_id.item())]
 
                 # Get sampled token probability
                 token_id = sample_results[i][0][0]  # First token of first beam
@@ -299,6 +322,7 @@ class FacadeSampler(nn.Module):
         elif self.sampling_method == "eta":
             logits = self.eta_truncate(logits)
         elif self.sampling_method == "mirostat":
+            self.mirostat_init(sampling_metadata)
             logits = self.mirostat_truncate(logits)
 
         # We use float32 for probabilities and log probabilities.
@@ -1033,9 +1057,7 @@ def _get_logprobs(
     top_logprob_idx = 0
     selected_logprobs_idx = 0
 
-    for seq_group, sample_result in zip(
-        sampling_metadata.seq_groups, sample_results
-    ):
+    for seq_group, sample_result in zip(sampling_metadata.seq_groups, sample_results):
         (prompt_logprobs, top_logprob_idx, selected_logprobs_idx) = _get_prompt_logprob_if_needed(
             seq_group,
             selected_logprobs,

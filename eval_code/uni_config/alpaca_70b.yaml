@@ -1,0 +1,89 @@
+seed: 42
+limit: 500
+model_name: "Llama-3-70B-Instruct"
+save_dir: "./alpaca_outputs_70B"
+template: "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nYou are a professional writing assistant. Follow the user's instructions carefully.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n{instruction}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
+max_tokens: &max_tokens 512
+algorithms:
+  - name: "greedy"
+    params:
+      temperature: 0.0
+      max_tokens: *max_tokens
+  - name: "top_p_0.9_t_1.0"
+    params:
+      top_p: 0.9
+      temperature: 1.0
+      max_tokens: *max_tokens
+  - name: "top_p_0.9_t_1.5"
+    params:
+      top_p: 0.9
+      temperature: 1.5
+      max_tokens: *max_tokens
+  - name: "top_k_20_t_1.0"
+    params:
+      top_k: 20
+      temperature: 1.0
+      max_tokens: *max_tokens
+  - name: "top_k_20_t_1.5"
+    params:
+      top_k: 20
+      temperature: 1.5
+      max_tokens: *max_tokens
+  - name: "top_nsigma_1.0_t_1.0"
+    params:
+      temperature: 1.0
+      max_tokens: *max_tokens
+    facade_params:
+      top_nsigma: 1.0
+  - name: "min_p_0.1_t_1.0"
+    params:
+      min_p: 0.1
+      temperature: 1.0
+      max_tokens: *max_tokens
+  - name: "min_p_0.1_t_1.5"
+    params:
+      min_p: 0.1
+      temperature: 1.5
+      max_tokens: *max_tokens
+  - name: "top_nsigma_1.0_t_1.5"
+    params:
+      temperature: 1.5
+      max_tokens: *max_tokens
+    facade_params:
+      top_nsigma: 1.0
+  - name: "top_nsigma_1.0_t_3.0"
+    params:
+      temperature: 3.0
+      max_tokens: *max_tokens
+    facade_params:
+      top_nsigma: 1.0
+  - name: "top_nsigma_1.0_t_10.0"
+    params:
+      temperature: 10.0
+      max_tokens: *max_tokens
+    facade_params:
+      top_nsigma: 1.0
+  - name: "eta_t_1.0"
+    params:
+      temperature: 1.0
+      max_tokens: *max_tokens
+    facade_params:
+      eta_eps: 9.0e-4
+  - name: "eta_t_1.5"
+    params:
+      temperature: 1.5
+      max_tokens: *max_tokens
+    facade_params:
+      eta_eps: 9.0e-4
+  - name: "miro_t_1.0"
+    params:
+      temperature: 1.0
+      max_tokens: *max_tokens
+    facade_params:
+      mirostat_tau: 5.0
+  - name: "miro_t_1.5"
+    params:
+      temperature: 1.5
+      max_tokens: *max_tokens
+    facade_params:
+      mirostat_tau: 5.0

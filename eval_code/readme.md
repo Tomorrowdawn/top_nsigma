@@ -11,8 +11,21 @@ Make sure you have model weights under `$HF_MODELS_CACHE/{MODEL_NAME}`
 ```bash
 pip install -r requirements.txt
 cd eval_code
+```
 
+Reasoning:
+
+```bash
 python uni_evaluate.py --config_path uni_config/8b.yaml > 8b.log
+```
+
+Creative Writing:
+
+First modify the `API_KEY` in `alpaca_evaluator/evaluate_secrete.sh` into your own key. Choose the correct size (8B or 70B) and run the following commands.
+
+```bash
+python alpaca.py --config_path uni_config/alpaca_8b.yaml
+bash alpaca_evaluator/evaluate_secrete.sh
 ```
 
 `vllm` version is important (0.5.5), since they had some breaking changes in new updates.
@@ -24,6 +37,13 @@ python uni_evaluate.py --config_path uni_config/8b.yaml > 8b.log
 
 ```bash
 python uni_evaluate.py 
+    --config_path # PATH TO YOUR CONFIG
+    --gpu_util #vllm's gpu utilization. eg, 0.9
+    --cuda # cuda device string. 0,2,4. Tensor parallelization will be automatically triggered if more than one device is provided.
+```
+
+```bash
+python alpaca.py 
     --config_path # PATH TO YOUR CONFIG
     --gpu_util #vllm's gpu utilization. eg, 0.9
     --cuda # cuda device string. 0,2,4. Tensor parallelization will be automatically triggered if more than one device is provided.
@@ -71,6 +91,10 @@ This file defines overall evaluation settings:
 - `metrics`: List of evaluation metrics (e.g., ExactMatch, PassAtK, Majority)
 
 So, not limited to the exisiting tasks, you can also add your own tasks by creating these two types of files.
+
+##### Alpaca Config
+
+Alpaca config is quite manual because automatical execution might be too costly.  The main difference is you should pass single value for each `params` or `facade_params`. Other options are similar.
 
 ### Output results
 
